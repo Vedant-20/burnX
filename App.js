@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
 import People from "./screens/People";
@@ -13,47 +13,63 @@ import { userProfileUpdater } from "./store/userSlice";
 import { Provider, useDispatch } from "react-redux";
 import store from "./store/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import AuthLoadingScreen from "./screens/AuthLoadingScreen";
+import Toast, { BaseToast } from "react-native-toast-message";
+import CreatePost from "./screens/CreatePost";
 
 // routes
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  // const dispatch = useDispatch();
-  const navigation = useNavigation();
+function App() {
+  const dispatch = useDispatch();
 
-  const AutomaticLoginUser = async () => {
-    try {
-      const token = AsyncStorage.getItem("jwtToken");
-
-      if (token) {
-        navigation.navigate("home");
-      }
-    } catch (error) {
-      navigation.navigate("login");
-    }
+  const toastConfig = {
+    success: ({ ...rest }) => (
+      <BaseToast
+        {...rest}
+        style={{ borderLeftColor: "#ccc", backgroundColor: "#4fbf26" }}
+        text1Style={{
+          fontWeight: "600",
+          fontSize: 20,
+          color: "white",
+        }}
+      />
+    ),
+    error: ({ ...rest }) => (
+      <BaseToast
+        {...rest}
+        style={{ borderLeftColor: "#ccc", backgroundColor: "#ff5349" }}
+        text1Style={{
+          fontWeight: "500",
+        }}
+      />
+    ),
   };
 
   const GetCurrentUser = async () => {
     try {
       const response = await axiosInstance.get(`/users/get-current-user`);
-      console.log("Get current user", response);
-      // dispatch(userProfileUpdater(response?.data));
+      // console.log("Get current user", response);
+      dispatch(userProfileUpdater(response?.data));
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    AutomaticLoginUser();
     GetCurrentUser();
   }, []);
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="login">
+      <Stack.Navigator initialRouteName="AuthLoading">
         <Stack.Screen
           name="home"
           component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AuthLoading"
+          component={AuthLoadingScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -81,10 +97,24 @@ export default function App() {
           component={UpdateProfile}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="createpost"
+          component={CreatePost}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
+      <Toast autoHide visibilityTime={1000} config={toastConfig} />
     </NavigationContainer>
   );
 }
+
+export default () => {
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

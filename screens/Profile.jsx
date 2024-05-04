@@ -1,73 +1,130 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import React from "react";
 
 import Layout from "../components/Layout/Layout";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import Post from "../components/Post";
+import { ToastMessage } from "../components/Toast";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Profile() {
   const navigation = useNavigation();
+  const user = useSelector((state) => state.user.user);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("jwtToken");
+      ToastMessage.showSuccessMessage("Logged Out Successfully");
+      navigation.navigate("login");
+    } catch (error) {
+      ToastMessage.showErrorMessage("Something went wrong");
+      console.log(error);
+      navigation.navigate("login");
+    }
+  };
+
   return (
     <Layout>
       <View style={styles.container}>
         <View style={{ top: 0, position: "relative" }}>
-          <Image
-            source={{
-              uri: "https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png",
-            }}
-            style={styles.profilePic}
-          />
+          {user?.profilePic ? (
+            <Image src={user?.profilePic} style={styles.profilePic} />
+          ) : (
+            <Image
+              source={{
+                uri: "https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png",
+              }}
+              style={styles.profilePic}
+            />
+          )}
         </View>
 
-        <Text style={styles.name}>John Doe</Text>
-        <Text style={styles.username}>@johndoe</Text>
-        <Text style={styles.bio}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-          consequat justo nec velit elementum, eu mattis ligula dapibus.
-        </Text>
+        <Text style={styles.name}>{user?.name}</Text>
+        <Text style={styles.username}>@{user?.username}</Text>
+        <Text style={styles.bio}>{user?.bio}</Text>
         <View style={styles.followersContainer}>
-          <Text style={styles.followersCount}>1.5k followers</Text>
-          <Text style={styles.followingCount}>800 following</Text>
+          <Text style={styles.followersCount}>
+            {user?.followers?.length} followers
+          </Text>
+          <Text style={styles.followingCount}>
+            {user?.following?.length} following
+          </Text>
         </View>
 
-        <View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#007bff",
-              padding: 10,
-              borderRadius: 5,
-              marginTop: 40,
-            }}
-            onPress={() => {}}
-          >
-            <Text
-              style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}
-            >
-              Freeze Account
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#90EE90",
-              padding: 10,
-              borderRadius: 5,
-              marginTop: 40,
-            }}
-            onPress={() => {
-              navigation.navigate("updateprofile");
-            }}
-          >
-            <Text
+        <View style={{ display: "flex", flexDirection: "row", gap: 20 }}>
+          <View>
+            <TouchableOpacity
               style={{
-                color: "black",
-                textAlign: "center",
-                fontWeight: "bold",
+                backgroundColor: "#007bff",
+                padding: 10,
+                borderRadius: 5,
+                marginTop: 20,
+              }}
+              onPress={() => {}}
+            >
+              <Text
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Freeze Account
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#90EE90",
+                padding: 10,
+                borderRadius: 5,
+                marginTop: 20,
+              }}
+              onPress={() => {
+                navigation.navigate("updateprofile");
               }}
             >
-              Update Profile
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Update Profile
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "crimson",
+                padding: 10,
+                borderRadius: 5,
+                marginTop: 20,
+              }}
+              onPress={handleLogout}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Logout
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Layout>
@@ -89,6 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 2,
     borderColor: "white",
+    objectFit: "fill",
   },
   name: {
     fontSize: 24,

@@ -17,7 +17,7 @@ export default function Header() {
       </TouchableOpacity>
       <TouchableOpacity>
         <View style={styles.chatLogoContainer}>
-          <FontAwesome size={30} color={"#90EE90"} name="wechat" />
+          <FontAwesome size={30} color={"#0BDA51"} name="wechat" />
         </View>
       </TouchableOpacity>
     </View>

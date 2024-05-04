@@ -31,6 +31,16 @@ export default function Footer() {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.menuContainer}
+        onPress={() => navigation.navigate("createpost")}
+      >
+        <FontAwesome
+          style={[styles.icon, route.name === "createpost" && styles.active]}
+          name="plus-square"
+          color={"white"}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.menuContainer}
         onPress={() => navigation.navigate("profile")}
       >
         <FontAwesome

@@ -1,6 +1,15 @@
 {
   "expo": {
     "name": "burnX",
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+          
+        }
+      ]
+    ],
     "slug": "burnX",
     "version": "1.0.0",
     "orientation": "portrait",
