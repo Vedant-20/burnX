@@ -49,7 +49,7 @@ export default function Login() {
               values
             );
 
-            AsyncStorage.setItem("jwtToken", response?.data?.token);
+            await AsyncStorage.setItem("jwtToken", response?.data?.token);
             setLoading(false);
             navigation.navigate("home");
           } catch (error) {

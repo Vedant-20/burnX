@@ -6,23 +6,27 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 
 import Layout from "../components/Layout/Layout";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Post from "../components/Post";
 import { ToastMessage } from "../components/Toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { userProfileUpdater } from "../store/userSlice";
+import axiosInstance from "../axiosInstance/axiosInstance";
 
 export default function Profile() {
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("jwtToken");
       ToastMessage.showSuccessMessage("Logged Out Successfully");
+      dispatch(userProfileUpdater(null));
       navigation.navigate("login");
     } catch (error) {
       ToastMessage.showErrorMessage("Something went wrong");
@@ -30,6 +34,20 @@ export default function Profile() {
       navigation.navigate("login");
     }
   };
+
+  const GetCurrentUser = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/get-current-user`);
+      // console.log("Get current user", response);
+      dispatch(userProfileUpdater(response?.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    GetCurrentUser();
+  }, []);
 
   return (
     <Layout>

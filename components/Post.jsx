@@ -1,40 +1,84 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Actions from "./Actions";
+import axiosInstance from "../axiosInstance/axiosInstance";
+import { formatDistanceToNow } from "date-fns";
+import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Post() {
+export default function Post({ post, postedBy, GetFeedPosts }) {
+  const currentUser = useSelector((state) => state.user.user);
+  const navigation = useNavigation();
+  const [user, setUser] = useState(null);
+
+  const GetPostUser = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/profile/${postedBy}`);
+      // console.log(response, "post owner");
+      setUser(response?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    GetPostUser();
+  }, []);
   return (
-    <TouchableOpacity onPress={() => {}}>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("postscreen", {
+          pid: post?._id,
+          username: user?.username,
+        })
+      }
+    >
       <View style={styles.postContainer}>
         <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri: `https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png`,
-            }}
-            style={styles.avatar}
-          />
-
-          <View
-            style={{
-              width: 1,
-              height: 250,
-              backgroundColor: "#007FFF",
-              marginVertical: 5,
-            }}
-          />
-          <View style={{ position: "relative", width: "100%" }}>
+          {user?.profilePic ? (
+            <Image src={user?.profilePic} style={styles.avatar} />
+          ) : (
             <Image
               source={{
-                uri: `https://cdn4.sharechat.com/samanthaprofilephotos_30a36964_1612287686205_sc_cmprsd_40.jpg?tenant=sc&referrer=tag-service&f=rsd_40.jpg`,
+                uri: `https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png`,
               }}
+              style={styles.avatar}
+            />
+          )}
+
+          {post?.replies.length !== 0 && post?.img && (
+            <View
               style={{
-                height: 20,
-                width: 20,
-                borderRadius: 25,
-                marginLeft: 20,
+                width: 1,
+                height: 250,
+                backgroundColor: "#007FFF",
+                marginVertical: 5,
               }}
             />
+          )}
+          {post?.replies.length !== 0 && post?.img === "" && (
+            <View
+              style={{
+                width: 1,
+                height: 50,
+                backgroundColor: "#007FFF",
+                marginVertical: 5,
+              }}
+            />
+          )}
+          <View style={{ position: "relative", width: "100%" }}>
+            {post?.replies[0] && (
+              <Image
+                src={post.replies[0].userProfilePic}
+                style={{
+                  height: 20,
+                  width: 20,
+                  borderRadius: 25,
+                  marginLeft: 20,
+                }}
+              />
+            )}
           </View>
         </View>
         <View
@@ -57,7 +101,7 @@ export default function Post() {
                   color: "white",
                 }}
               >
-                username
+                {user?.username}
               </Text>
               <Image
                 source={{
@@ -75,16 +119,18 @@ export default function Post() {
                   marginRight: 10,
                 }}
               >
-                5 hours ago
+                {formatDistanceToNow(new Date(post?.createdAt))} ago
               </Text>
-              <FontAwesome
-                style={{ fontSize: 25 }}
-                name="trash"
-                color={"red"}
-              />
+              {currentUser?._id === user?._id && (
+                <FontAwesome
+                  style={{ fontSize: 25 }}
+                  name="trash"
+                  color={"red"}
+                />
+              )}
             </View>
           </View>
-          <Text style={{ fontSize: 14, color: "white" }}>Post Text</Text>
+          <Text style={{ fontSize: 14, color: "white" }}>{post.text}</Text>
           <View
             style={{
               borderRadius: 6,
@@ -94,14 +140,11 @@ export default function Post() {
               marginVertical: 5,
             }}
           >
-            <Image
-              source={{
-                uri: `https://static1.colliderimages.com/wordpress/wp-content/uploads/2023/10/the-eminence-in-shadow-1.jpg`,
-              }}
-              style={{ width: "100%", height: 200 }}
-            />
+            {post?.img && (
+              <Image src={post?.img} style={{ width: "100%", height: 200 }} />
+            )}
           </View>
-          <Actions />
+          <Actions post={post} GetFeedPosts={GetFeedPosts} />
         </View>
       </View>
     </TouchableOpacity>
@@ -112,6 +155,7 @@ const styles = StyleSheet.create({
   postContainer: {
     flexDirection: "row",
     marginBottom: 10,
+    marginTop: 10,
     paddingVertical: 10,
     backgroundColor: "transparent",
     borderRadius: 1,

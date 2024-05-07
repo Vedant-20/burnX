@@ -1,26 +1,71 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout/Layout";
 import Post from "../components/Post";
+import axiosInstance from "../axiosInstance/axiosInstance";
+import { useDispatch } from "react-redux";
+import { postsUpdater } from "../store/postSlice";
 
 export default function Home() {
+  const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const disptach = useDispatch();
+
+  const GetFeedPosts = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/posts/feed`);
+      // console.log(response, "fedd posts check");
+      setPosts(response?.data);
+      disptach(postsUpdater(response?.data));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    GetFeedPosts();
+  }, []);
   return (
     <Layout>
       <View style={styles.container}>
         <View style={styles.postContainer}>
-          <Text style={styles.followUsersText}>
-            Follow some users to see the feed
-          </Text>
+          {!loading && posts.length === 0 && (
+            <Text style={styles.followUsersText}>
+              Follow some users to see the feed
+            </Text>
+          )}
+
+          {loading && (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          )}
           {/* Map Post Here in component */}
           <ScrollView>
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
+            {posts.map((post, index) => (
+              <Post
+                key={post._id}
+                post={post}
+                postedBy={post.postedBy}
+                GetFeedPosts={GetFeedPosts}
+              />
+            ))}
           </ScrollView>
         </View>
       </View>
@@ -31,9 +76,9 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     // flexDirection: "column",
-    justifyContent: "center",
+    // justifyContent: "center",
 
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#101010",
     height: 800,
   },
@@ -44,6 +89,7 @@ const styles = StyleSheet.create({
   postContainer: {
     display: "flex",
     flex: 1,
+    marginBottom: 40,
     // flexDirection: "column",
     // justifyContent: "center",
     // alignItems: "center",

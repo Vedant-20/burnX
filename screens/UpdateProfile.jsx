@@ -22,8 +22,8 @@ export default function UpdateProfile() {
   const dispatch = useDispatch();
 
   const [updating, setUpdating] = useState(false);
-  const [imgUrl, setImgUrl] = useState(null);
-  // const { handleImageChange, imgUrl } = usePreviewImg();
+  const [imgUrl, setImgUrl] = useState(user?.profilePic);
+
   const [inputs, setInputs] = useState({
     name: user?.name,
     username: user?.username,
@@ -81,7 +81,7 @@ export default function UpdateProfile() {
             >
               {user?.profilePic ? (
                 <Image
-                  src={imgUrl || user?.profilePic}
+                  src={imgUrl}
                   style={{
                     width: 100,
                     height: 100,

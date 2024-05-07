@@ -16,6 +16,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthLoadingScreen from "./screens/AuthLoadingScreen";
 import Toast, { BaseToast } from "react-native-toast-message";
 import CreatePost from "./screens/CreatePost";
+import PostScreen from "./screens/PostScreen";
+import UserChatScreen from "./screens/UserChatScreen";
+import MessageScreen from "./screens/MessageScreen";
+import { SocketContextProvider } from "./context/SocketContext";
 
 // routes
 const Stack = createNativeStackNavigator();
@@ -102,6 +106,21 @@ function App() {
           component={CreatePost}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="postscreen"
+          component={PostScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="userchatscreen"
+          component={UserChatScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="messagescreen"
+          component={MessageScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
       <Toast autoHide visibilityTime={1000} config={toastConfig} />
     </NavigationContainer>
@@ -111,7 +130,9 @@ function App() {
 export default () => {
   return (
     <Provider store={store}>
-      <App />
+      <SocketContextProvider>
+        <App />
+      </SocketContextProvider>
     </Provider>
   );
 };

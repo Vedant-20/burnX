@@ -1,11 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Header() {
+  const navigation = useNavigation();
   return (
     <View style={styles.header}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("home")}>
         <View style={styles.logoConatiner}>
           <View>
             <Text style={styles.logo}>🔥</Text>
@@ -15,7 +17,7 @@ export default function Header() {
           </View>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("userchatscreen")}>
         <View style={styles.chatLogoContainer}>
           <FontAwesome size={30} color={"#0BDA51"} name="wechat" />
         </View>

@@ -8,13 +8,69 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import axiosInstance from "../axiosInstance/axiosInstance";
+import { ToastMessage } from "./Toast";
+import { useSelector } from "react-redux";
 
-export default function Actions() {
-  const [liked, setLiked] = useState(false);
+export default function Actions({ post, GetFeedPosts }) {
+  const user = useSelector((state) => state.user.user);
+  const [liked, setLiked] = useState(post?.likes?.includes(user?._id));
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
   const [reply, setReply] = useState("");
+  const postState = useSelector((state) => state.post.posts);
+  const [posts, setPosts] = useState(postState);
   const handleReply = async () => {
-    console.log("reply", reply);
+    try {
+      const response = await axiosInstance.put(`/posts/reply/${post?._id}`, {
+        text: reply,
+      });
+      ToastMessage.showSuccessMessage("Replied Successfully");
+      GetFeedPosts();
+      setModalVisible(false);
+      setReply("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLikeandUnlike = async () => {
+    try {
+      setIsLiking(true);
+      const res = await axiosInstance.put(`/posts/like/${post?._id}`);
+
+      if (!liked) {
+        const updatedPosts = posts.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, likes: [...p.likes, user._id] };
+          }
+          return p;
+        });
+        setPosts(updatedPosts);
+      } else {
+        const updatedPosts = posts.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, likes: p.likes.filter((id) => id !== user._id) };
+          }
+          return p;
+        });
+        setPosts(updatedPosts);
+      }
+      setLiked(!liked);
+
+      {
+        liked
+          ? ToastMessage.showSuccessMessage("Unliked Successfully")
+          : ToastMessage.showSuccessMessage("Liked Successfully");
+      }
+
+      GetFeedPosts();
+    } catch (error) {
+      console.log(error);
+      ToastMessage.showErrorMessage("Error while liking");
+    } finally {
+      setIsLiking(false);
+    }
   };
   return (
     <View style={{ flexDirection: "column" }}>
@@ -27,7 +83,7 @@ export default function Actions() {
           gap: 80,
         }}
       >
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={handleLikeandUnlike}>
           <FontAwesome5
             name="fire-alt"
             size={25}
@@ -50,9 +106,14 @@ export default function Actions() {
       <View
         style={{ flexDirection: "row", alignItems: "center", marginBottom: 5 }}
       >
-        <Text style={{ fontSize: 12, color: "#999", marginRight: 5 }}>
-          6 replies
-        </Text>
+        {post?.replies?.length === 0 && (
+          <Text style={{ textAlign: "center" }}>🥱</Text>
+        )}
+        {post?.replies?.length !== 0 && (
+          <Text style={{ fontSize: 12, color: "#999", marginRight: 5 }}>
+            {post?.replies?.length} replies
+          </Text>
+        )}
         <View
           style={{
             width: 1,
@@ -62,7 +123,7 @@ export default function Actions() {
           }}
         />
         <Text style={{ fontSize: 12, color: "#999", marginRight: 5 }}>
-          5 likes
+          {post?.likes?.length} likes
         </Text>
       </View>
       {modalVisible && (

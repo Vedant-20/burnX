@@ -1,8 +1,10 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
+import useFollowUnFollow from "../hooks/useFollowUnFollow";
 
-export default function SuggestedUser() {
-  const following = false;
+export default function SuggestedUser({ user }) {
+  const { handleFollowUnfollow, following, updating } = useFollowUnFollow(user);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -14,23 +16,32 @@ export default function SuggestedUser() {
         }}
         onPress={() => {}}
       >
-        <Image
-          source={{
-            uri: `https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png`,
-          }}
-          style={{ height: 100, width: 100 }}
-        />
+        {user?.profilePic ? (
+          <Image
+            source={{
+              uri: user?.profilePic,
+            }}
+            style={{ height: 100, width: 100, borderRadius: 5 }}
+          />
+        ) : (
+          <Image
+            source={{
+              uri: `https://cdn.pixabay.com/photo/2014/04/02/17/07/user-307993_640.png`,
+            }}
+            style={{ height: 100, width: 100 }}
+          />
+        )}
 
         <View style={{ marginLeft: 50 }}>
           <Text style={{ fontSize: 22, fontWeight: "bold", color: "white" }}>
-            Username
+            {user?.username}
           </Text>
-          <Text style={{ color: "#999", fontSize: 16 }}>Name</Text>
+          <Text style={{ color: "#999", fontSize: 16 }}>{user?.name}</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={handleFollowUnfollow}
         style={{
           backgroundColor: following ? "white" : "#007bff",
           paddingVertical: 5,
@@ -55,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginTop: 30,
+    marginTop: 5,
     borderWidth: 1,
     borderColor: "white",
     borderRadius: 10,
