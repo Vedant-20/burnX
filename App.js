@@ -20,6 +20,7 @@ import PostScreen from "./screens/PostScreen";
 import UserChatScreen from "./screens/UserChatScreen";
 import MessageScreen from "./screens/MessageScreen";
 import { SocketContextProvider } from "./context/SocketContext";
+import Context from "./context/Context";
 
 // routes
 const Stack = createNativeStackNavigator();
@@ -60,8 +61,20 @@ function App() {
     }
   };
 
+  const GetFeedPosts = async () => {
+    try {
+      const response = await axiosInstance.get(`/posts/feed`);
+      // console.log(response, "fedd posts check");
+
+      dispatch(postsUpdater(response?.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     GetCurrentUser();
+    GetFeedPosts();
   }, []);
   return (
     <NavigationContainer>
@@ -130,9 +143,11 @@ function App() {
 export default () => {
   return (
     <Provider store={store}>
+      {/* <Context.Provider value={{ GetFeedPosts }}> */}
       <SocketContextProvider>
         <App />
       </SocketContextProvider>
+      {/* </Context.Provider> */}
     </Provider>
   );
 };

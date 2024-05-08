@@ -10,13 +10,15 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout/Layout";
 import Post from "../components/Post";
 import axiosInstance from "../axiosInstance/axiosInstance";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { postsUpdater } from "../store/postSlice";
+import { userProfileUpdater } from "../store/userSlice";
 
 export default function Home() {
+  const feedPosts = useSelector((state) => state?.post?.posts);
   const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useState([]);
-  const disptach = useDispatch();
+  const [posts, setPosts] = useState(feedPosts);
+  const dispatch = useDispatch();
 
   const GetFeedPosts = async () => {
     setLoading(true);
@@ -24,7 +26,7 @@ export default function Home() {
       const response = await axiosInstance.get(`/posts/feed`);
       // console.log(response, "fedd posts check");
       setPosts(response?.data);
-      disptach(postsUpdater(response?.data));
+      dispatch(postsUpdater(response?.data));
     } catch (error) {
       console.log(error);
     } finally {
@@ -32,8 +34,19 @@ export default function Home() {
     }
   };
 
+  const GetCurrentUser = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/get-current-user`);
+      // console.log("Get current user", response);
+      dispatch(userProfileUpdater(response?.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     GetFeedPosts();
+    GetCurrentUser();
   }, []);
   return (
     <Layout>
@@ -58,7 +71,7 @@ export default function Home() {
           )}
           {/* Map Post Here in component */}
           <ScrollView>
-            {posts.map((post, index) => (
+            {posts?.map((post, index) => (
               <Post
                 key={post._id}
                 post={post}

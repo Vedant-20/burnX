@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import Layout from "../components/Layout/Layout";
 import { useNavigation } from "@react-navigation/native";
@@ -16,11 +16,13 @@ import { ToastMessage } from "../components/Toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { userProfileUpdater } from "../store/userSlice";
 import axiosInstance from "../axiosInstance/axiosInstance";
+import UserPosts from "../components/UserPosts";
 
 export default function Profile() {
   const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
+  const [posts, setPosts] = useState([]);
 
   const handleLogout = async () => {
     try {
@@ -45,8 +47,28 @@ export default function Profile() {
     }
   };
 
+  const GetUserPosts = async () => {
+    try {
+      const res = await axiosInstance.get(`/posts/user/${user?.username}`);
+      // console.log(res, "user posts");
+      setPosts(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFreeze = async () => {
+    try {
+      const res = await axiosInstance.put(`/users/freeze`);
+      ToastMessage.showSuccessMessage("Account Freezed Successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     GetCurrentUser();
+    GetUserPosts();
   }, []);
 
   return (
@@ -86,7 +108,7 @@ export default function Profile() {
                 borderRadius: 5,
                 marginTop: 20,
               }}
-              onPress={() => {}}
+              onPress={handleFreeze}
             >
               <Text
                 style={{
@@ -144,6 +166,19 @@ export default function Profile() {
             </TouchableOpacity>
           </View>
         </View>
+        <ScrollView
+          style={{ display: "flex", flexDirection: "row", gap: 4 }}
+          horizontal
+        >
+          {posts.map((post, index) => (
+            <UserPosts
+              key={post?._id}
+              post={post}
+              postedBy={post?.postedBy}
+              GetPosts={GetUserPosts}
+            />
+          ))}
+        </ScrollView>
       </View>
     </Layout>
   );

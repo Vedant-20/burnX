@@ -11,7 +11,7 @@ function AuthLoadingScreen() {
       try {
         const token = await AsyncStorage.getItem("jwtToken");
         if (token) {
-          navigation.navigate("home");
+          navigation.navigate("people");
         } else {
           navigation.navigate("login");
         }

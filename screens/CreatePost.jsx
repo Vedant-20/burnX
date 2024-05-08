@@ -22,7 +22,7 @@ import { ToastMessage } from "../components/Toast";
 const MAX_CHAR = 500;
 
 export default function CreatePost() {
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state?.user?.user);
   const navigation = useNavigation();
   const [postText, setPostText] = useState("");
   const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
@@ -69,6 +69,7 @@ export default function CreatePost() {
       navigation.navigate("home");
     } catch (error) {
       console.log(error);
+      ToastMessage.showErrorMessage("Text is Required");
     } finally {
       setUploading(false);
     }

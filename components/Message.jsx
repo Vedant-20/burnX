@@ -25,8 +25,8 @@ export default function Message({ ownMessage, message }) {
             <View
               style={{
                 backgroundColor: "#34D399",
-                maxWidth: 350,
-                width: 150,
+                maxWidth: 150,
+                // width: 150,
                 padding: 1,
                 borderRadius: 4,
                 marginTop: 2,
@@ -78,7 +78,7 @@ export default function Message({ ownMessage, message }) {
                 backgroundColor: "#d3d3d3",
                 padding: 3,
                 borderRadius: 4,
-                maxWidth: "350px",
+                maxWidth: 150,
               }}
             >
               {message?.text}

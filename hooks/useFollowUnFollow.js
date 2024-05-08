@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastMessage } from "../components/Toast";
 import axiosInstance from "../axiosInstance/axiosInstance";
+import Context from "../context/Context";
 
 const useFollowUnFollow = (user) => {
   const currentUser = useSelector((state) => state.user.user);
+  // const { GetFeedPosts } = useContext(Context);
   const [following, setFollowing] = useState(
     user?.followers?.includes(currentUser?._id)
   );
@@ -32,6 +34,7 @@ const useFollowUnFollow = (user) => {
         user.followers.push(currentUser?._id);
       }
       setFollowing(!following);
+      // GetFeedPosts();
     } catch (error) {
       console.log(error);
       ToastMessage.showErrorMessage(error.message);

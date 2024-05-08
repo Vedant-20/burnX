@@ -100,18 +100,34 @@ export default function MessageInput({ setMessages }) {
         <FontAwesome6 name="image" color={"#ccc"} size={16} />
       </TouchableOpacity>
       {imgUrl && (
-        <View>
-          <Image source={{ uri: imgUrl }} />
+        <View
+          style={{
+            right: 50,
+            bottom: 300,
+          }}
+        >
+          <Image
+            source={{ uri: imgUrl }}
+            style={{ width: 350, height: 350, borderWidth: 4, borderRadius: 5 }}
+          />
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "flex-end",
+              justifyContent: "center",
               marginVertical: 10,
             }}
           >
             {!isSending ? (
-              <TouchableOpacity onPress={handleSendMessage}>
-                <FontAwesome name="send" color={"#ccc"} size={16} />
+              <TouchableOpacity
+                style={{
+                  borderWidth: 4,
+                  borderColor: "lime",
+                  borderRadius: 5,
+                  padding: 2,
+                }}
+                onPress={handleSendMessage}
+              >
+                <FontAwesome name="send" color={"lime"} size={34} />
               </TouchableOpacity>
             ) : (
               <ActivityIndicator size={"small"} color={"lime"} />

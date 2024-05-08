@@ -16,13 +16,16 @@ import { imageToBase64 } from "../hooks/imageToBase64";
 import axiosInstance from "../axiosInstance/axiosInstance";
 import { userProfileUpdater } from "../store/userSlice";
 import { ToastMessage } from "../components/Toast";
+import { useNavigation } from "@react-navigation/native";
 
 export default function UpdateProfile() {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const [updating, setUpdating] = useState(false);
-  const [imgUrl, setImgUrl] = useState(user?.profilePic);
+  const [imgUrl, setImgUrl] = useState("");
+  const tempImg = user?.profilePic;
 
   const [inputs, setInputs] = useState({
     name: user?.name,
@@ -41,6 +44,7 @@ export default function UpdateProfile() {
       // console.log(imgUrl, "Final aimge receievdalsd");
       const finalImg = "data:image/jpeg;base64," + base64;
       setImgUrl(finalImg);
+
       // console.log(finalImg, "REceived image from document picker");
     } catch (error) {
       console.log(error, "Eroor in document pciker");
@@ -57,6 +61,7 @@ export default function UpdateProfile() {
       // console.log(response, "Update profile response");
       dispatch(userProfileUpdater(response?.data));
       ToastMessage.showSuccessMessage("Profile Updated Successfully ");
+      navigation.navigate("profile");
     } catch (error) {
       console.log(error);
       setUpdating(false);
@@ -81,7 +86,7 @@ export default function UpdateProfile() {
             >
               {user?.profilePic ? (
                 <Image
-                  src={imgUrl}
+                  src={imgUrl || tempImg}
                   style={{
                     width: 100,
                     height: 100,
