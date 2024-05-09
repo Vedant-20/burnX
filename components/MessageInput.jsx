@@ -85,10 +85,24 @@ export default function MessageInput({ setMessages }) {
     }
   };
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+        marginTop: 3,
+      }}
+    >
       <TextInput
-        style={{ flex: 1, color: "white" }}
-        placeholder="Type a message"
+        style={{
+          flex: 1,
+          color: "white",
+          borderWidth: 1,
+          borderColor: "#ccc",
+          padding: 5,
+          borderRadius: 5,
+        }}
+        placeholder="Type a message...."
         placeholderTextColor={"#ccc"}
         onChangeText={(text) => setMessageText(text)}
         value={messageText}
